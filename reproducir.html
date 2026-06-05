@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reproducir</title>
+
+<style>
+
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:Arial,sans-serif;
+}
+
+header{
+background:#111;
+padding:15px;
+}
+
+a{
+color:#e50914;
+text-decoration:none;
+font-weight:bold;
+}
+
+.container{
+padding:20px;
+}
+
+iframe{
+width:100%;
+height:75vh;
+border:none;
+border-radius:8px;
+}
+
+h1{
+margin-top:20px;
+}
+
+.info{
+margin-top:10px;
+color:#ccc;
+}
+
+</style>
+</head>
+<body>
+
+<header>
+<a href="index.html">← Volver</a>
+</header>
+
+<div class="container">
+
+<div id="player"></div>
+
+<h1 id="titulo"></h1>
+
+<div class="info" id="info"></div>
+
+</div>
+
+<script>
+
+const params=
+new URLSearchParams(
+window.location.search
+);
+
+const id=
+parseInt(params.get("id"));
+
+fetch("conciertos.json")
+.then(r=>r.json())
+.then(data=>{
+
+const c=
+data.find(x=>x.id===id);
+
+if(!c)return;
+
+document.getElementById("player")
+.innerHTML=`
+<iframe
+src="${c.embed}"
+allowfullscreen>
+</iframe>
+`;
+
+document.getElementById("titulo")
+.textContent=c.titulo;
+
+document.getElementById("info")
+.innerHTML=`
+${c.artista} •
+${c.pais} •
+${c.anio} •
+${c.duracion}
+`;
+
+localStorage.setItem(
+"ultimoConcierto",
+JSON.stringify(c)
+);
+
+});
+
+</script>
+
+</body>
+</html>
