@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Panel de Administración</title>
+
+<link rel="stylesheet" href="assets/styles.css">
+
+</head>
+<body>
+
+<header>
+
+<div class="logo">
+BABYMETAL ADMIN
+</div>
+
+<a href="index.html" class="btn">
+Volver al sitio
+</a>
+
+</header>
+
+<div class="admin-container">
+
+<h1 class="admin-title">
+Panel de Administración
+</h1>
+
+<div class="admin-stats">
+
+<div>
+🎬 <span id="totalConciertos">0</span>
+</div>
+
+<div>
+🌎 <span id="totalPaises">0</span>
+</div>
+
+<div>
+🎤 <span id="totalArtistas">0</span>
+</div>
+
+<div>
+📻 <span id="totalTemporadas">0</span>
+</div>
+
+</div>
+
+<div class="admin-form">
+
+<input type="text" id="titulo" placeholder="Título">
+<input type="text" id="artista" placeholder="Artista">
+
+<select id="tipo">
+<option>Concierto</option>
+<option>Metaraji</option>
+<option>Festival</option>
+<option>Documental</option>
+</select>
+
+<input type="text" id="pais" placeholder="País">
+<input type="text" id="anio" placeholder="Año">
+<input type="text" id="duracion" placeholder="Duración">
+<div id="metarajiFields">
+
+<input
+type="number"
+id="temporada"
+placeholder="Temporada">
+
+<input
+type="number"
+id="episodio"
+placeholder="Episodio">
+
+</div>
+<input type="text" id="portada" placeholder="img/portada.jpg">
+<input type="text" id="banner" placeholder="img/banner.jpg">
+
+<input type="text" id="embed"
+placeholder="https://www.yourupload.com/embed/...">
+<input type="text" id="trailer"
+placeholder="https://www.youtube.com/embed/...">
+<input
+type="hidden"
+id="editarId">
+
+<textarea id="descripcion"
+placeholder="Descripción"></textarea>
+
+<textarea id="sinopsis"
+placeholder="Sinopsis"></textarea>
+
+</div>
+
+<div class="admin-actions">
+
+<button
+class="admin-btn"
+id="previewBtn">
+
+👁 Vista Previa
+
+</button>
+
+<button
+class="admin-btn"
+id="agregarBtn">
+
+➕ Agregar Concierto
+
+</button>
+
+<button
+class="admin-btn"
+id="generarSerieBtn">
+
+📺 Generar Serie
+
+</button>
+
+<button
+class="admin-btn"
+id="generarBtn">
+
+📋 Generar JSON
+
+</button>
+
+<button
+class="admin-btn"
+id="descargarBtn">
+
+⬇ Descargar JSON
+
+</button>
+
+</div>
+
+<div class="preview-container">
+
+<h2>
+Vista Previa
+</h2>
+
+<div
+class="preview-card"
+id="previewCard">
+
+<img
+id="previewImg"
+src="https://via.placeholder.com/320x450?text=PORTADA">
+
+<div
+class="preview-title"
+id="previewTitle">
+
+Título del concierto
+
+</div>
+
+<div
+class="preview-meta"
+id="previewMeta">
+
+📅 Año • 🌎 País • ⏱ Duración
+
+</div>
+
+<div
+class="preview-description"
+id="previewDescription">
+
+Descripción del concierto.
+
+</div>
+
+<div
+id="previewTrailer"
+style="margin-top:15px;">
+</div>
+
+</div>
+
+</div>
+
+<div class="admin-json">
+
+<h2>
+Importar conciertos.json
+</h2>
+
+<textarea
+id="jsonImport"
+placeholder="Pega aquí tu conciertos.json completo">
+</textarea>
+
+<br><br>
+
+<button
+class="admin-btn"
+id="importarBtn">
+
+📂 Importar JSON
+
+</button>
+
+</div>
+
+<table class="admin-table">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Título</th>
+<th>País</th>
+<th>Tipo</th>
+<th>Acciones</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tablaConciertos">
+
+</tbody>
+
+</table>
+
+<div class="admin-json">
+
+<h2>
+JSON Generado
+</h2>
+
+<textarea
+id="jsonOutput"
+readonly>
+</textarea>
+
+</div>
+
+</div>
+
+<script src="assets/admin.js"></script>
+
+</body>
+</html>
