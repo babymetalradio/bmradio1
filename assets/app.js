@@ -1,14 +1,19 @@
 let conciertos = [];
 
+/* CARGA INICIAL */
+
 document.addEventListener("DOMContentLoaded", () => {
 
     fetch("conciertos.json")
     .then(response => response.json())
     .then(data => {
 
-        conciertos = data;
+        conhtml += `
+            </div>
+        </div>
+        `;ciertos = data;
 
-        if(conciertos.length === 0){
+        if(!Array.isArray(conciertos) || conciertos.length === 0){
 
             document.getElementById("contenido").innerHTML =
             "<div class='section'><h2>No hay conciertos disponibles</h2></div>";
@@ -18,8 +23,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         crearBanner();
         crearCategorias();
+setTimeout(
+activarCarruseles,
+200
+);
         cargarContinuar();
+        cargarFavoritos();
+        cargarUltimos();
         iniciarBuscador();
+        iniciarMenu();
 
     })
     .catch(error => {
@@ -33,24 +45,46 @@ document.addEventListener("DOMContentLoaded", () => {
 
 });
 
+/* BANNER */
+
 function crearBanner(){
 
-    const c = conciertos[0];
+    const c =
+    conciertos[
+        Math.floor(
+            Math.random() *
+            conciertos.length
+        )
+    ];
 
     document.getElementById("banner").innerHTML = `
-        <div class="banner" style="background-image:url('${c.banner}')">
-            <div class="banner-content">
-                <h1>${c.titulo}</h1>
-                <p>${c.descripcion}</p>
+    <div class="banner"
+         style="background-image:url('${c.banner}')">
 
-                <a class="btn"
-                   href="reproducir.html?id=${c.id}">
-                   ▶ Reproducir
-                </a>
-            </div>
+        <div class="banner-content">
+
+            <h1>${c.titulo}</h1>
+
+            <p>
+            📅 ${c.anio} •
+            🌎 ${c.pais} •
+            ⏱ ${c.duracion}
+            </p>
+
+            <p>${c.descripcion}</p>
+
+            <a class="btn"
+               href="reproducir.html?id=${c.id}">
+               ▶ Reproducir
+            </a>
+
         </div>
+
+    </div>
     `;
 }
+
+/* CATEGORIAS */
 
 function crearCategorias(){
 
@@ -58,8 +92,6 @@ function crearCategorias(){
     document.getElementById("contenido");
 
     contenido.innerHTML = "";
-
-    /* TIPOS */
 
     const tipos =
     [...new Set(conciertos.map(x => x.tipo))];
@@ -71,38 +103,55 @@ function crearCategorias(){
 
         let html = `
         <div class="section">
-            <h2>${tipo}s</h2>
-            <div class="row">
+            <h2>🎤 ${tipo}s (${lista.length})</h2>
+            <div class="carousel-container">
+
+<button
+class="carousel-btn left">
+
+◀
+
+</button>
+
+<div class="row">
         `;
 
         lista.forEach(item => {
 
-            html += `
-            <div class="card"
-                 onclick="abrir(${item.id})">
+            html += crearCard(item);
 
-                <img src="${item.portada}"
-                     alt="${item.titulo}"
-                     loading="lazy">
-
-                <div class="card-title">
-                    ${item.titulo}
-                </div>
-
-            </div>
-            `;
         });
 
         html += `
+
             </div>
+
+            <button
+            class="carousel-btn right">
+
+            ▶
+
+            </button>
+
         </div>
-        `;
+
+    </div>
+
+`;
 
         contenido.innerHTML += html;
 
     });
 
-    /* PAÍSES */
+    const banderas = {
+        "Japón":"🇯🇵",
+        "México":"🇲🇽",
+        "Estados Unidos":"🇺🇸",
+        "Reino Unido":"🇬🇧",
+        "Alemania":"🇩🇪",
+        "Francia":"🇫🇷",
+        "Corea del Sur":"🇰🇷"
+    };
 
     const paises =
     [...new Set(conciertos.map(x => x.pais))];
@@ -113,39 +162,87 @@ function crearCategorias(){
         conciertos.filter(x => x.pais === pais);
 
         let html = `
-        <div class="section">
-            <h2>${pais}</h2>
-            <div class="row">
-        `;
+<div class="section">
+
+    <h2>
+    ${banderas[pais] || "🌎"} ${pais} (${lista.length})
+    </h2>
+
+    <div class="carousel-container">
+
+        <button
+        class="carousel-btn left">
+
+        ◀
+
+        </button>
+
+        <div class="row">
+`;
 
         lista.forEach(item => {
 
-            html += `
-            <div class="card"
-                 onclick="abrir(${item.id})">
+            html += crearCard(item);
 
-                <img src="${item.portada}"
-                     alt="${item.titulo}"
-                     loading="lazy">
-
-                <div class="card-title">
-                    ${item.titulo}
-                </div>
-
-            </div>
-            `;
         });
 
         html += `
-            </div>
+
         </div>
-        `;
+
+        <button
+        class="carousel-btn right">
+
+        ▶
+
+        </button>
+
+    </div>
+
+</div>
+
+`;
 
         contenido.innerHTML += html;
 
     });
 
 }
+
+/* TARJETAS */
+
+function crearCard(item){
+
+    const activo =
+    obtenerFavoritos().includes(item.id);
+
+    return `
+    <div class="card"
+         onclick="abrir(${item.id})">
+
+        <img
+        src="${item.portada}"
+        alt="${item.titulo}"
+        loading="lazy">
+
+        <button
+        class="favorite"
+        onclick="event.stopPropagation();
+        toggleFavorito(${item.id})">
+
+        ${activo ? "❤️" : "🤍"}
+
+        </button>
+
+        <div class="card-title">
+            ${item.titulo}
+        </div>
+
+    </div>
+    `;
+}
+
+/* ABRIR */
 
 function abrir(id){
 
@@ -164,29 +261,167 @@ function abrir(id){
 
 }
 
+/* CONTINUAR */
+
 function cargarContinuar(){
 
     const ultimo =
-    localStorage.getItem("ultimoConcierto");
+    localStorage.getItem(
+        "ultimoConcierto"
+    );
 
     if(!ultimo) return;
 
-    const c = JSON.parse(ultimo);
+    const c =
+    JSON.parse(ultimo);
 
-    document.getElementById("continuar").innerHTML = `
+    document.getElementById("continuar")
+    .innerHTML = `
+    <div class="card"
+         onclick="abrir(${c.id})">
+
+        <img src="${c.portada}">
+
+        <div class="card-title">
+            ${c.titulo}
+        </div>
+
+    </div>
+    `;
+}
+
+/* FAVORITOS */
+
+function obtenerFavoritos(){
+
+    return JSON.parse(
+        localStorage.getItem("favoritos")
+    ) || [];
+
+}
+
+function toggleFavorito(id){
+
+    let favoritos =
+    obtenerFavoritos();
+
+    if(favoritos.includes(id)){
+
+        favoritos =
+        favoritos.filter(
+            x => x !== id
+        );
+
+    }else{
+
+        favoritos.push(id);
+
+    }
+
+    localStorage.setItem(
+        "favoritos",
+        JSON.stringify(favoritos)
+    );
+
+    cargarFavoritos();
+cargarUltimos();
+crearCategorias();
+
+setTimeout(
+activarCarruseles,
+200
+);
+
+}
+
+function cargarFavoritos(){
+
+    const contenedor =
+    document.getElementById("favoritos");
+
+    if(!contenedor) return;
+
+    const favoritos =
+    obtenerFavoritos();
+
+    document.querySelector(
+        "#favoritos-section h2"
+    )?.replaceChildren(
+        document.createTextNode(
+            `❤️ Mi Lista (${favoritos.length})`
+        )
+    );
+
+    contenedor.innerHTML = "";
+
+    favoritos.forEach(id => {
+
+        const concierto =
+        conciertos.find(
+            x => x.id === id
+        );
+
+        if(!concierto) return;
+
+        contenedor.innerHTML += `
         <div class="card"
-             onclick="abrir(${c.id})">
+             onclick="abrir(${concierto.id})">
 
-            <img src="${c.portada}"
-                 alt="${c.titulo}">
+            <img src="${concierto.portada}">
 
             <div class="card-title">
-                ${c.titulo}
+                ${concierto.titulo}
             </div>
 
         </div>
-    `;
+        `;
+
+    });
+
 }
+
+/* ULTIMOS */
+
+function cargarUltimos(){
+
+    const ultimos =
+    [...conciertos]
+    .reverse()
+    .slice(0,10);
+
+    document.querySelector(
+        "#ultimos-section h2"
+    )?.replaceChildren(
+        document.createTextNode(
+            `🕒 Últimos agregados (${ultimos.length})`
+        )
+    );
+
+    const contenedor =
+    document.getElementById("ultimos");
+
+    contenedor.innerHTML = "";
+
+    ultimos.forEach(item => {
+
+        contenedor.innerHTML += `
+        <div class="card"
+             onclick="abrir(${item.id})">
+
+            <img src="${item.portada}">
+
+            <div class="card-title">
+                ${item.titulo}
+            </div>
+
+        </div>
+        `;
+
+    });
+
+}
+
+/* BUSCADOR */
 
 function iniciarBuscador(){
 
@@ -217,45 +452,139 @@ function iniciarBuscador(){
 
 }
 
-/* FAVORITOS */
+/* MENU */
 
-function obtenerFavoritos(){
+function iniciarMenu(){
 
-    return JSON.parse(
-        localStorage.getItem("favoritos")
-    ) || [];
+    const menu =
+    document.getElementById("menuBtn");
 
-}
+    const sidebar =
+    document.getElementById("sidebar");
 
-function agregarFavorito(id){
+    const overlay =
+    document.getElementById("overlay");
 
-    let favoritos =
-    obtenerFavoritos();
+    if(!menu) return;
 
-    if(!favoritos.includes(id)){
+    menu.addEventListener(
+        "click",
+        () => {
 
-        favoritos.push(id);
+            sidebar.classList.add(
+                "active"
+            );
 
-        localStorage.setItem(
-            "favoritos",
-            JSON.stringify(favoritos)
-        );
+            overlay.classList.add(
+                "active"
+            );
 
-    }
-
-}
-
-function eliminarFavorito(id){
-
-    let favoritos =
-    obtenerFavoritos();
-
-    favoritos =
-    favoritos.filter(f => f !== id);
-
-    localStorage.setItem(
-        "favoritos",
-        JSON.stringify(favoritos)
+        }
     );
+
+    overlay.addEventListener(
+        "click",
+        () => {
+
+            sidebar.classList.remove(
+                "active"
+            );
+
+            overlay.classList.remove(
+                "active"
+            );
+
+        }
+    );
+
+}
+
+/* BOTON ARRIBA */
+
+const scrollBtn =
+document.createElement("button");
+
+scrollBtn.innerHTML = "⬆";
+
+scrollBtn.className =
+"scrollTop";
+
+document.body.appendChild(
+scrollBtn
+);
+
+window.addEventListener(
+"scroll",
+() => {
+
+if(window.scrollY > 400){
+
+scrollBtn.classList.add("show");
+
+}else{
+
+scrollBtn.classList.remove("show");
+
+}
+
+});
+
+scrollBtn.addEventListener(
+"click",
+() => {
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+});
+function activarCarruseles(){
+
+document
+.querySelectorAll(
+".carousel-btn.left"
+)
+.forEach(btn=>{
+
+btn.addEventListener(
+"click",
+()=>{
+
+const row =
+btn.parentElement
+.querySelector(".row");
+
+row.scrollBy({
+left:-400,
+behavior:"smooth"
+});
+
+});
+
+});
+
+document
+.querySelectorAll(
+".carousel-btn.right"
+)
+.forEach(btn=>{
+
+btn.addEventListener(
+"click",
+()=>{
+
+const row =
+btn.parentElement
+.querySelector(".row");
+
+row.scrollBy({
+left:400,
+behavior:"smooth"
+});
+
+});
+
+});
 
 }
